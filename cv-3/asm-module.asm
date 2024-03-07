@@ -5,9 +5,6 @@ section .data
 section .text
 
 global strCat
-
-
-
 strCat:
     mov rax, -1 ; indext of first occurance
     xor rcx, rcx ; current index
@@ -47,3 +44,74 @@ strCat:
 .done:
     mov [count], r8 ; count = r8
     ret ; return default value (rax)
+
+
+
+global str2int
+
+str2int:
+    xor rcx, rcx    ; current index
+    xor rax, rax    ; clear rax to accumulate integer value
+.loop:
+    mov dl, [rdi + rcx] ; load symbol
+    cmp dl, 0   ; test for '\0'
+    je .done   ; if true - finish
+
+    ; Multiply the current result by 10
+    mov rbx, 10
+    imul rax, rbx
+
+    ; Convert character to integer
+    sub dl, '0'
+    ; Add the converted digit
+    add rax, rdx
+
+    ; Move to the next character
+    inc rcx
+    jmp .loop
+.done:
+    mov [rsi], rax  ; put result into output
+    ret
+
+;делаю хор по маске(сдвиг на н битов) и в конце считаю количество еденичек на выходе
+
+
+global not_bits
+not_bits:
+    mov rdi, rdi ; first param (input)
+    mov rsi, rsi ; second param (array)
+    mov rdx, rdx ; (length)
+    dec rdx ; dec to ajust indexes
+    xor rax, rax ;  output
+
+.loop:
+    cmp rdx, 0
+    jl .processed
+
+    mov cl, [rsi + rdx] ; load bit n
+
+    ; xor mask with input
+    mov rbx, 1
+    shl rbx, cl
+    xor rdi, rbx      ; xor with rbx
+
+    dec rdx
+    jmp .loop
+.processed:
+    mov rsp, rdi
+
+    and rsp, 1
+    cpm rsp, 0
+    je .next_bit
+    
+    inc rax
+.next_bit:
+    shr rdi, 1
+
+    cmp rdi, 0 
+    je .done ; if number == 0
+
+    jmp .processed
+.done:
+    ret
+
