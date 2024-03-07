@@ -9,7 +9,7 @@ char buff[255] = "1234501";
 int num = 0;
 void str2int(char *str, int *num);
 //
-long var = 0xf0f0f0;
+long var = 0xf0f0;
 char array[] = {0, 1, 2, 10, 15};
 int size = 5;
 int not_bits(long *var, char *array, long size);

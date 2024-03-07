@@ -83,7 +83,7 @@ not_bits:
     mov rdx, rdx ; (length)
     dec rdx ; dec to ajust indexes
     xor rax, rax ;  output
-
+    jmp .processed
 .loop:
     cmp rdx, 0
     jl .processed
@@ -98,20 +98,16 @@ not_bits:
     dec rdx
     jmp .loop
 .processed:
-    mov rsp, rdi
-
-    and rsp, 1
-    cpm rsp, 0
-    je .next_bit
+    test rdi, 1 ; put ZF
+    jz .next_bit
     
     inc rax
 .next_bit:
     shr rdi, 1
 
-    cmp rdi, 0 
-    je .done ; if number == 0
+    test rdi, rdi
+    jnz .processed ; if number != 0
 
-    jmp .processed
 .done:
     ret
 
