@@ -110,9 +110,6 @@ multiples:
     ret
 
 
-.leave:
-    ret
-
 
 
 
@@ -122,27 +119,46 @@ change_array_by_avg:
     ;rdi - array
     ;rsi - length
 
-    xor rcx,rcx ; array counter
-    xor rax,rax; avarage sum
-.enter_avarage:
+    xor rcx, rcx   ; array counter
+    xor rax, rax   ; average sum
+
+enter_average:
     cmp rcx, rsi
-    jge .leave_avarage
+    jge leave_average
     add rax, [rdi + rcx * 8]
     inc rcx
-    jmp .enter_avarage
-.leave_avarage:
-    dec rcx; nums amount
-    div rcx; rax = rax / rcx, rdx = rax % rcx
-    xor rcx,rcx
-    
-.enter_arraychanger:
-    cmp rcx, rsi
-    jge .leave
+    jmp enter_average
 
-    cmp rcx, 0 
-    jg .
- 
+leave_average:
+    dec rcx        ; nums amount
+    div rcx        ; rax = rax / rcx, rdx = rax % rcx ; issue is here
+    xor rcx, rcx
+
+enter_arraychanger:
+    cmp rcx, rsi
+    jge exit
+
+    cmp [rdi + rcx * 8], rax
+    jl is_negative
+    jg is_positive
+
+    cmp rdx, 0
+    jg is_negative
+
+    jmp increment
+
+is_negative:
+    mov qword [rdi + rcx * 8], -1     ; Move -1 to memory if negative
+    jmp increment
+
+is_positive:
+    mov qword [rdi + rcx * 8], 1      ; Move 1 to memory if positive
+    jmp increment
+
+increment:
     inc rcx
-    jmp .enter_arraychanger
-.leave:
+    jmp enter_arraychanger
+
+exit:
     ret
+
