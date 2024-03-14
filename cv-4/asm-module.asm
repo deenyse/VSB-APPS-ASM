@@ -130,7 +130,8 @@ enter_average:
     jmp enter_average
 
 leave_average:
-    dec rcx        ; nums amount
+    
+    xor rdx,rdx
     div rcx        ; rax = rax / rcx, rdx = rax % rcx ; issue is here
     xor rcx, rcx
 
