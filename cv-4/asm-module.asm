@@ -132,33 +132,32 @@ enter_average:
 leave_average:
     
     xor rdx,rdx
-    div rcx        ; rax = rax / rcx, rdx = rax % rcx ; issue is here
+    div rcx        ; rax = rax / rcx, rdx = rax % rcx 
     xor rcx, rcx
-
 enter_arraychanger:
-    cmp rcx, rsi
-    jge exit
+cmp rcx, rsi
+jge exit
 
-    cmp [rdi + rcx * 8], rax
-    jl is_negative
-    jg is_positive
+mov r9, 1
+mov r10, -1
 
-    cmp rdx, 0
-    jg is_negative
+mov r11, qword [rdi + rcx * 8]
 
-    jmp increment
+cmp r11, rax
+cmovl r11, r10                    
+cmovg r11, r9                     
 
-is_negative:
-    mov qword [rdi + rcx * 8], -1     ; Move -1 to memory if negative
-    jmp increment
+test r11, qword [rdi + rcx * 8]
+jne next
 
-is_positive:
-    mov qword [rdi + rcx * 8], 1      ; Move 1 to memory if positive
-    jmp increment
+cmp rdx , 0
+cmovg r11, r10
 
-increment:
-    inc rcx
-    jmp enter_arraychanger
+next:
+mov qword [rdi + rcx * 8], r11    
+
+inc rcx
+jmp enter_arraychanger
 
 exit:
     ret

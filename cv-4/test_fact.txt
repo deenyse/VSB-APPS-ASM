@@ -35,3 +35,32 @@ loop_increment:
 
 loop_end:
     ret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        cmp rcx, rsi
+    jge exit
+
+    mov r9 , 1
+    mov r10, -1
+    cmp [rdi + rcx * 8], r8
+    cmovl qword [rdi + rcx * 8], r10
+    cmovg qword [rdi + rcx * 8], r9 
+
+
+    cmp rdx, 0
+    cmovg qword [rdi + rcx * 8], r10
+
+
+    inc rcx

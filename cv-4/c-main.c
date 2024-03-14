@@ -48,7 +48,7 @@ int main()
 
     //
 
-    long array2[4] = {2, 2, 2, 2};
+    long array2[4] = {1, 1, 2, 2};
     change_array_by_avg(array2, 4);
     for (int i = 0; i < 4; i++)
     {
