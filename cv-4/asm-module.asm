@@ -5,49 +5,144 @@ section .text
 global Factorial
 
 Factorial:
-    ; Set up stack frame
-    push rbp
-    mov rbp, rsp
-    push rbx
-    push rcx
-    push rdx
-
-    mov rbx, rdi; array "poiter"
-    mov ecx, esi; number of elements
-
+    ;rdi; array "poiter"
+    ; esi number of elements
     xor eax, eax; owerflow amount
-    xor esi, esi; array i
-loop_start:
-    cmp esi, ecx
-    jge loop_end
+    xor ecx, ecx; array i
+.loop_start:
+    cmp ecx, esi
+    jge .loop_end
 
-    mov edx, dword [rbx + rsi * 4]; current arr elem
-    mov edi, 1; current factorial j
-    mov ecx, 1; sotore for result of factorial
+    mov edx, dword [rdi + rsi * 4]; current arr elem
+    xor edi, edi; current factorial j == 0 to begin with 0;
+    mov esp, 1; sotore for result of factorial
 
-factorial_loop:
-    imul ecx, edi;result * counter
-    jo overflow_occurred ; check overflow 
+.factorial_loop:
     inc edi; increment factorial counter
     cmp edi, edx; end of factorial inner loop?
-    jle factorial_loop 
-    jmp store_result
-store_result:
-    mov [rbx + rsi * 4], ecx; save noowerflow result
-    jmp loop_increment;go to begining of the loop
+    jg .store_result 
+    
+    imul dword esp, edi;result * counter
+    ;error place
+    jo .overflow_occurred ; check overflow 
+    jmp .factorial_loop
+.store_result:
+    mov [rdi + rsi * 4], esp; save noowerflow result
+    jmp .loop_increment;go to begining of the loop
 
-overflow_occurred:
-    mov dword [rbx + rsi * 4], 0; owerflow elem to zero
+.overflow_occurred:
+    and dword [rdi + rsi * 4], 0; owerflow elem to zero
     inc eax; owerfloe elems ++
-    jmp loop_increment
+    jmp .loop_increment
 
-loop_increment:
-    inc esi
-    jmp loop_start
+.loop_increment:
+    inc ecx
+    jmp .loop_start
 
-loop_end:
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rbp
+.loop_end:
+    ret
+
+
+global fill_pyramid_numbers
+
+fill_pyramid_numbers:
+    ; rdi - array 
+    ; rsi - length
+
+    xor rbx, rbx; loop counter i
+.loop:
+    cmp rbx, rsi
+    jge .leave
+
+    ; Calculate n(n+1)(2n+1)
+    mov rcx, rbx; n
+    inc rcx; n + 1
+    mov rdx, rcx; n + 1
+    inc rdx; n + 2
+
+    mov r8, rcx; r8 = n + 1
+    imul r8, 2; r8 = 2n + 2
+    inc r8; r8 = 2n + 3
+
+    imul rcx, rdx; n(n + 1)
+    imul rcx, r8; n(n + 1)(2n + 3)
+
+    ; Perform division
+    mov rax, rcx; Move value to rax for division
+    mov rdx, 0; Clear rdx
+    mov r8, 6; Set divisor to 6
+    div r8; Divide rax (n(n+1)(2n+1)) by 6, quotient in rax
+
+    ; Store result in array
+    mov [rdi + rbx * 8], rax
+
+    inc rbx
+    jmp .loop
+.leave:
+    ret
+
+
+global multiples
+multiples:
+    ;rdi - array
+    ;rsi - length
+    ;rdx - factor
+    mov rbx, rdx; factor to rbx
+    xor r8, r8; issue nums count
+    xor rcx, rcx; counter i
+.loop:
+    cmp rcx, rsi
+    jge .leave
+    mov rax, [rdi + rcx * 8]
+    xor rdx, rdx; clear rdx for division
+    div rbx; rax = rax / rbx, rdx = rax % rbx
+    test rdx, rdx; 
+    jnz .issue
+    jmp .next
+.issue:
+    sub [rdi + rcx * 8], rdx
+    inc r8 
+.next:
+    inc rcx
+    jmp .loop
+.leave:
+    mov rax, r8; Move issue numbers count to rax
+    ret
+
+
+.leave:
+    ret
+
+
+
+
+global change_array_by_avg
+
+change_array_by_avg:
+    ;rdi - array
+    ;rsi - length
+
+    xor rcx,rcx ; array counter
+    xor rax,rax; avarage sum
+.enter_avarage:
+    cmp rcx, rsi
+    jge .leave_avarage
+    add rax, [rdi + rcx * 8]
+    inc rcx
+    jmp .enter_avarage
+.leave_avarage:
+    dec rcx; nums amount
+    div rcx; rax = rax / rcx, rdx = rax % rcx
+    xor rcx,rcx
+    
+.enter_arraychanger:
+    cmp rcx, rsi
+    jge .leave
+
+    cmp rcx, 0 
+    jg .
+ 
+    inc rcx
+    jmp .enter_arraychanger
+.leave:
     ret

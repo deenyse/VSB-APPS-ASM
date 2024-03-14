@@ -1,0 +1,37 @@
+Factorial:
+    ;rdi; array "poiter"
+    ; esi number of elements
+    xor eax, eax; owerflow amount
+    xor ecx, ecx; array i
+loop_start:
+    cmp ecx, esi
+    jge loop_end
+
+    mov edx, dword [rdi + rsi * 4]; current arr elem
+    xor edi, edi; current factorial j == 0 to begin with 0;
+    mov esp, 1; sotore for result of factorial
+
+factorial_loop:
+    inc edi; increment factorial counter
+    cmp edi, edx; end of factorial inner loop?
+    jg store_result 
+    
+    imul dword esp, edi;result * counter
+    ;error place
+    jo overflow_occurred ; check overflow 
+    jmp factorial_loop
+store_result:
+    mov [rdi + rsi * 4], esp; save noowerflow result
+    jmp loop_increment;go to begining of the loop
+
+overflow_occurred:
+    and dword [rdi + rsi * 4], 0; owerflow elem to zero
+    inc eax; owerfloe elems ++
+    jmp loop_increment
+
+loop_increment:
+    inc ecx
+    jmp loop_start
+
+loop_end:
+    ret
